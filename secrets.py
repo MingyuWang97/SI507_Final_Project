@@ -1,0 +1,2 @@
+mapbox_access_token = "pk.eyJ1IjoibWluZ3l1LXdhbmciLCJhIjoiY2tpZGFodWZtMWg4MDMwczV4ZnhmcGd4YiJ9.7g-HY3dHAD9AzEzy3GI4Dg"
+map_request_api_key = "r46o9OAvdSyX39gI5OPHSPRxrwQqxjvP"
