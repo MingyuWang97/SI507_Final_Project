@@ -1,2 +1,3 @@
 mapbox_access_token = "pk.eyJ1IjoibWluZ3l1LXdhbmciLCJhIjoiY2tpZGFodWZtMWg4MDMwczV4ZnhmcGd4YiJ9.7g-HY3dHAD9AzEzy3GI4Dg"
 map_request_api_key = "r46o9OAvdSyX39gI5OPHSPRxrwQqxjvP"
+yelp_api_key = "GRp_bqSHKZrPeVvZboMP2ZNyirIAVSGVr3hOaEmlalhnOSzNmGarSrD_DpvPtJ4e3LScPi-8eQzc92xYS7giFciCXD5LwNFGOU9BnskKr0plswBVrVYRVmVYpkbKX3Yx"

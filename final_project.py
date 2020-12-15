@@ -19,6 +19,7 @@ DB_NAME = 'attractions.sqlite'
 
 mapbox_access_token = secrets.mapbox_access_token
 map_request_api_key = secrets.map_request_api_key
+yelp_api_key = secrets.yelp_api_key
 
 class Attraction:
     ''' an attraction
@@ -417,6 +418,40 @@ def draw_map_with_attractions(state_name):
     
     plot_attractions_location_on_map(list_lng, list_lat, list_name)
 
+def plot_restaurants(result_json):
+    restaurants = result_json["businesses"]
+    name = []
+    rating = []
+    review = []
+    transactions = []
+
+    for restaurant in restaurants:
+        name.append(restaurant['name'])
+        rating.append(restaurant['rating'])
+        review.append(restaurant['review_count'])
+        transactions.append(restaurant['transactions'])
+
+    rating_bar_data = go.Bar(x=name, y=rating)
+    basic_layout1 = go.Layout(title="Rating")
+    fig_rating_bar = go.Figure(data=rating_bar_data, layout=basic_layout1)
+
+    review_bar_data = go.Bar(x=name, y=review)
+    basic_layout2 = go.Layout(title="Review")
+    fig_review_bar = go.Figure(data=review_bar_data, layout=basic_layout2)
+
+    fig_rating_bar.write_html("ratingbarchart.html", auto_open=True) 
+    fig_review_bar.write_html("reviewbarchart.html", auto_open=True)
+
+
+def getNearbyRestaurant(attraction):
+    headers = {'Authorization': 'Bearer %s' % yelp_api_key}
+    url='https://api.yelp.com/v3/businesses/search'
+    coordinate = geocoding(attraction.address)
+    lat = coordinate['lat']
+    lng = coordinate['lng']
+    params = {'term':'restaurants','latitude':lat, 'longitude':lng,'sort_by':'rating', 'limit':10} # return 10 restaurants
+    request = requests.get(url, params=params, headers=headers)
+    return json.loads(request.text) #json
 
 if __name__ == "__main__":
     # load the cache
@@ -448,26 +483,29 @@ if __name__ == "__main__":
 
             while(True):
                 command = input("Input the number 1-10 for detailed search or \"exit\" or \"back\":")
-                index = int(command)-1
                 if(command == "exit"):
                     sys.exit(0)
                 elif(command == "back"):
                     break
-                elif(index in list(range(10))):
-                    command2 = input("Input \"eat\" for nearby restaurant recommendations or \"website\" to jump to website or \"exit\" or \"back\":")
-                    if(command2 == "exit"):
-                        sys.exit(0)
-                    elif(command2 == "back"):
-                        break
-                    elif(command2 == "eat"):
-                        pass
-                    elif(command2 == "website"):
-                        website = top10_atractions[index-1].website
-                        if(website == "no website"):
-                            print("The website for this attraction is not available, please try other attractions!")
-                        else:
-                            # open url in default webbrowser:
-                            webbrowser.open(website)
+                elif(int(command)-1 in list(range(10))):
+                    while(True):
+                        index = int(command)-1
+                        command2 = input("Input \"eat\" for nearby restaurant recommendations or \"website\" to jump to website or \"exit\" or \"back\":")
+                        if(command2 == "exit"):
+                            sys.exit(0)
+                        elif(command2 == "back"):
+                            break
+                        elif(command2 == "eat"): # use yelp api to search nearby restaurants
+                            restaurants_json = getNearbyRestaurant(top10_atractions[index-1])
+                            plot_restaurants(restaurants_json)
+                            
+                        elif(command2 == "website"):
+                            website = top10_atractions[index-1].website
+                            if(website == "no website"):
+                                print("The website for this attraction is not available, please try other attractions!")
+                            else:
+                                # open url in default webbrowser:
+                                webbrowser.open(website)
                 else:
                     print("Please input a valid command, try again!")
 
